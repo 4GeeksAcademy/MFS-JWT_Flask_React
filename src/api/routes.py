@@ -22,25 +22,44 @@ def handle_hello():
         "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
     }
 
-
     return jsonify(response_body), 200
 # Create a route to authenticate your users and return JWTs. The
 # create_access_token() function is used to actually generate the JWT.
+
+
 @api.route("/login", methods=["POST"])
 def login():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
 
-    user=User.query.filter_by(email=email).first()
-    if user is None: 
-            return jsonify({"msg": "No existe el usuario"}),404
-    
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+            return jsonify({"msg": "No existe el usuario"}), 404
+
     if email != user.email or password != user.password:
         return jsonify({"msg": "Bad username or password"}), 401
 
     access_token = create_access_token(identity=email)
-    response_body ={
-         "access_token":access_token, 
+    response_body = {
+         "access_token": access_token,
          "user": user.serialize()
     }
     return jsonify(response_body), 200
+
+
+@api.route("/register", methods=["POST"])
+def register():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        new_user= User(
+        email=email,
+        password=password,
+        is_active = True
+     )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"msg":"Usuario creado exitosamente"}), 201
+    return jsonify({"msg":"Existe el usuario"}), 304  

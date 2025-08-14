@@ -16,7 +16,7 @@ export const Single = props => {
 
   return (
     <div className="container text-center">
-      <h1>Bienvenido</h1>
+      <h1>Bienvenido{user.email}</h1>
      
     </div>
   );
